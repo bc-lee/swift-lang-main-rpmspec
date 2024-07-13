@@ -63,7 +63,7 @@ jobs:
             done
           done
 
-          copr build ${args} leebc/swift-lang-beta ${{ steps.create-srpm.outputs.srpm_file }} --timeout 43200 --nowait
+          copr build ${args} leebc/swift-lang-beta ${{ steps.create-srpm.outputs.srpm-file }} --timeout 43200 --nowait
 
       - name: Notify failure
         if: failure()
