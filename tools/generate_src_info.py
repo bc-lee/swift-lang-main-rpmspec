@@ -80,6 +80,7 @@ class Repo:
 
 
 SCHEME_VERSION_MAP = {
+    # When update this, also update the .github/workflows/build.yml
     "release/6.0": "6.0",
     # Provisional
     "main": "6.1",

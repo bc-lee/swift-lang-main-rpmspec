@@ -1,0 +1,80 @@
+name: Build Beta
+
+defaults:
+  run:
+    shell: bash -exu {0}
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 02:00 KST = 17:00 UTC
+    - cron: '0 17 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.fedoraproject.org/fedora:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          dnf install -y curl jq  make rpm-build rpmdevtools python3-requests copr-cli
+
+      - name: Setup copr credentials
+        run: |
+          set +x
+          cat <<EOF > ~/.config/copr
+          ${{ secrets.COPR_CONFIG }}
+          EOF
+
+      - name: Create SRPM
+        id: create-srpm
+        run: |
+          tools/generate_src_info.py
+          generated_files=(version.inc source.inc rename.inc)
+          for file in "${generated_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "File $file not found"
+              exit 1
+            fi
+            echo "$file:"
+            cat "$file"
+          done
+          tools/validate_version.sh version.inc 6.0
+
+          make -f .copr/Makefile srpm outdir=$(pwd) spec=$(pwd)
+          srpm_file=$(ls -1 swift-*.src.rpm)
+          echo "srpm-file=$srpm_file" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger Build on copr
+        run: |
+          versions=(40 rawhide)
+          arch=(x86_64 aarch64)
+          args=""
+          for v in "${versions[@]}"; do
+            for a in "${arch[@]}"; do
+              args+=" -r fedora-$v-$a"
+            done
+          done
+
+          copr build ${args} leebc/swift-lang-beta ${{ steps.create-srpm.outputs.srpm_file }} --timoout 43200 --nowait
+
+      - name: Notify success
+        if: success()
+        run: |
+          message="swift-lang-beta build triggered on copr. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID for details."
+          tools/send-slack.py --message "$message" --url ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          message="swift-lang-beta build failed. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID for details."
+          tools/send-slack.py --message "$message" --url ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Cleanup copr credentials
+        if: always()
+        run: |
+          rm -f ~/.config/copr
