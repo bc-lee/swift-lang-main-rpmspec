@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          dnf install -y curl make git rpm-build rpmdevtools python3-requests copr-cli
+          dnf install -y curl make rpm-build rpmdevtools python3-requests copr-cli
 
       - name: Setup copr credentials
         run: |

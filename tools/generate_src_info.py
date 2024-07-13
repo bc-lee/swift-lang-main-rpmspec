@@ -30,7 +30,9 @@ import requests
 
 ROOT_DIR = Path(os.path.dirname(os.path.realpath(__file__))).parent.resolve()
 
-REPOSITORY_URL = "https://github.com/swiftlang/swift"
+REPO = "swiftlang/swift"
+REPOSITORY_URL = f"https://github.com/{REPO}"
+REPOSITORY_RAW_URL = f"https://raw.githubusercontent.com/{REPO}"
 CONFIG_FILE = "utils/update_checkout/update-checkout-config.json"
 
 # Structure of the CONFIG_FILE:
@@ -85,6 +87,30 @@ SCHEME_VERSION_MAP = {
     # Provisional
     "main": "6.1",
 }
+
+
+def read_checkout_config(scheme, src_dir=None):
+  if src_dir:
+    return read_checkout_config_from_local(src_dir)
+  return read_checkout_config_from_url(scheme)
+
+
+def read_checkout_config_from_local(src_dir):
+  config_file = src_dir / CONFIG_FILE
+  if not config_file.exists():
+    print(f"Config file {config_file} does not exist.")
+    sys.exit(1)
+
+  with open(config_file, "r") as f:
+    return json.load(f, object_pairs_hook=collections.OrderedDict)
+
+
+def read_checkout_config_from_url(scheme):
+  url = f"{REPOSITORY_RAW_URL}/{scheme}/{CONFIG_FILE}"
+  print(f"Fetching config file from {url}")
+  r = requests.get(url)
+  r.raise_for_status()
+  return r.json()
 
 
 def fetch_github_repo_commit(username, repo, branch, token=None):
@@ -147,131 +173,91 @@ def main():
     print(f"Scheme {scheme} not found in the version map.")
     return 1
 
-  use_temp_dir = False
-  if not src_dir:
-    print("No source directory specified. Use temporary directory to"
-          " clone the repository.")
-    src_dir = Path(tempfile.mkdtemp())
-    use_temp_dir = True
-  else:
-    src_dir = Path(src_dir)
-    if not src_dir.exists():
-      print(f"Source directory {src_dir} does not exist.")
+  config = read_checkout_config(scheme, src_dir)
+
+  if "repos" not in config:
+    print("No repositories found in the config file.")
+    return 1
+
+  repos = config["repos"]
+
+  if "branch-schemes" not in config:
+    print("No branch-schemes found in the config file.")
+    return 1
+
+  schemes = config["branch-schemes"]
+  if scheme not in schemes:
+    print(f"Scheme {scheme} not found in the config file.")
+    return 1
+
+  scheme_repos = schemes[scheme]["repos"]
+  # TODO(bc-lee): Use system's cmake and ninja to speed up the build
+  # remove cmake and ninja
+  # if "cmake" in scheme_repos:
+  #   scheme_repos.pop("cmake")
+  # if "ninja" in scheme_repos:
+  #   scheme_repos.pop("ninja")
+
+  repo_map = dict()
+  for repo, branch in scheme_repos.items():
+    if repo not in repos:
+      print(f"Repository {repo} not found in the config file.")
       return 1
 
-  try:
-    if use_temp_dir:
-      cmd = ["git", "clone", "-b", scheme, REPOSITORY_URL, str(src_dir)]
-      print(f"Running {shlex.join(cmd)}")
-      subprocess.run(cmd, check=True)
-    else:
-      cmd = ["git", "-C", str(src_dir), "fetch", "origin"]
-      print(f"Running {shlex.join(cmd)}")
-      subprocess.run(cmd, check=True)
+    remote = repos[repo]["remote"]["id"]
+    git_username, git_repo = remote.split("/", maxsplit=1)
+    commit = fetch_github_repo_commit(git_username, git_repo, branch, token)
+    repo_map[repo] = Repo(repo, remote, commit)
 
-      cmd = ["git", "-C", str(src_dir), "checkout", scheme]
-      print(f"Running {shlex.join(cmd)}")
-      subprocess.run(cmd, check=True)
+  if not write_to_file:
+    print(json.dumps([repo.__dict__ for repo in repo_map.values()], indent=2))
+    return 0
 
-      cmd = ["git", "-C", str(src_dir), "reset", "--hard", f"origin/{scheme}"]
-      print(f"Running {shlex.join(cmd)}")
-      subprocess.run(cmd, check=True)
+  swift_commit = repo_map["swift"].commit
+  # Sort the repositories by name, to ensure consistent output
+  result = []
+  for repo_name in sorted(repo_map.keys()):
+    result.append(repo_map[repo_name])
 
-    config_file = src_dir / CONFIG_FILE
-    if not config_file.exists():
-      print(f"Config file {config_file} does not exist.")
-      return 1
+  utcnow = datetime.datetime.now(datetime.UTC)
+  date = utcnow.strftime("%Y%m%d")
 
-    with open(config_file, "r") as f:
-      config = json.load(f, object_pairs_hook=collections.OrderedDict)
+  # Version format: <version>~pre^<date>git<commit>
+  version = f"{scheme_to_version}~pre^{date}git{swift_commit[:7]}"
 
-    if "repos" not in config:
-      print("No repositories found in the config file.")
-      return 1
-
-    repos = config["repos"]
-
-    if "branch-schemes" not in config:
-      print("No branch-schemes found in the config file.")
-      return 1
-
-    schemes = config["branch-schemes"]
-    if scheme not in schemes:
-      print(f"Scheme {scheme} not found in the config file.")
-      return 1
-
-    scheme_repos = schemes[scheme]["repos"]
-    # TODO(bc-lee): Use system's cmake and ninja to speed up the build
-    # remove cmake and ninja
-    # if "cmake" in scheme_repos:
-    #   scheme_repos.pop("cmake")
-    # if "ninja" in scheme_repos:
-    #   scheme_repos.pop("ninja")
-
-    repo_map = dict()
-    for repo, branch in scheme_repos.items():
-      if repo not in repos:
-        print(f"Repository {repo} not found in the config file.")
-        return 1
-
-      remote = repos[repo]["remote"]["id"]
-      git_username, git_repo = remote.split("/", maxsplit=1)
-      commit = fetch_github_repo_commit(git_username, git_repo, branch, token)
-      repo_map[repo] = Repo(repo, remote, commit)
-
-    if not write_to_file:
-      print(json.dumps([repo.__dict__ for repo in repo_map.values()], indent=2))
-      return 0
-
-    swift_commit = repo_map["swift"].commit
-    # Sort the repositories by name, to ensure consistent output
-    result = []
-    for repo_name in sorted(repo_map.keys()):
-      result.append(repo_map[repo_name])
-
-    utcnow = datetime.datetime.now(datetime.UTC)
-    date = utcnow.strftime("%Y%m%d")
-
-    # Version format: <version>~pre^<date>git<commit>
-    version = f"{scheme_to_version}~pre^{date}git{swift_commit[:7]}"
-
-    versio_inc = f"""%global swift_version {version}
+  versio_inc = f"""%global swift_version {version}
 %global package_version {scheme_to_version}
 
 """
-    for item in result:
-      versio_inc += f"%global {item.name.replace('-', '_')}_commit {item.commit}\n"
+  for item in result:
+    versio_inc += f"%global {item.name.replace('-', '_')}_commit {item.commit}\n"
 
-    with open(ROOT_DIR / "version.inc", "w") as f:
-      f.write(versio_inc)
+  with open(ROOT_DIR / "version.inc", "w") as f:
+    f.write(versio_inc)
 
-    source_inc = ""
-    for index, item in enumerate(result):
-      # Source index starts from 3 since first 3 sources are already defined
-      # for .inc files
-      source_inc += f"Source{index+3}: https://github.com/{item.remote}/archive/"
-      source_inc += "%{" + item.name.replace('-', '_') + "_commit}.tar.gz#/"
-      source_inc += item.name + "-%{" + item.name.replace(
-          '-', '_') + "_commit}.tar.gz\n"
+  source_inc = ""
+  for index, item in enumerate(result):
+    # Source index starts from 3 since first 3 sources are already defined
+    # for .inc files
+    source_inc += f"Source{index+3}: https://github.com/{item.remote}/archive/"
+    source_inc += "%{" + item.name.replace('-', '_') + "_commit}.tar.gz#/"
+    source_inc += item.name + "-%{" + item.name.replace(
+        '-', '_') + "_commit}.tar.gz\n"
 
-    with open(ROOT_DIR / "source.inc", "w") as f:
-      f.write(source_inc)
+  with open(ROOT_DIR / "source.inc", "w") as f:
+    f.write(source_inc)
 
-    rename_inc = ""
-    for item in result:
-      git_repo = item.remote.split("/", maxsplit=1)[1]
-      rename_inc += "mv " + git_repo + "-%{" + item.name.replace(
-          '-', '_') + "_commit} "
-      rename_inc += item.name + "\n"
+  rename_inc = ""
+  for item in result:
+    git_repo = item.remote.split("/", maxsplit=1)[1]
+    rename_inc += "mv " + git_repo + "-%{" + item.name.replace(
+        '-', '_') + "_commit} "
+    rename_inc += item.name + "\n"
 
-    with open(ROOT_DIR / "rename.inc", "w") as f:
-      f.write(rename_inc)
+  with open(ROOT_DIR / "rename.inc", "w") as f:
+    f.write(rename_inc)
 
-    print("All files generated successfully.")
-
-  finally:
-    if use_temp_dir:
-      shutil.rmtree(src_dir, ignore_errors=True)
+  print("All files generated successfully.")
 
 
 if __name__ == "__main__":
