@@ -55,7 +55,7 @@ jobs:
       - name: Trigger Build on copr
         run: |
           versions_raw=$(tools/find-last-2-fedora.py)
-          versions=(${versions_raw// / })')
+          versions=(${versions_raw// / })
           arch=(x86_64 aarch64)
           args=""
           for v in "${versions[@]}"; do
