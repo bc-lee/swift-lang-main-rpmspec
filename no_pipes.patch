@@ -59,25 +59,3 @@ diff --color -Naur llvm-project/libcxx/utils/libcxx/test/format.py llvm-project/
 +import shlex
  import re
  import shutil
- 
-diff --color -Naur ninja/configure.py ninja/configure.py
---- ninja/configure.py	2024-06-13 19:54:39.050795565 -0500
-+++ ninja/configure.py	2024-06-13 19:56:39.970026531 -0500
-@@ -23,7 +23,7 @@
- 
- from optparse import OptionParser
- import os
--import pipes
-+import shlex
- import string
- import subprocess
- import sys
-@@ -264,7 +264,7 @@
- env_keys = set(['CXX', 'AR', 'CFLAGS', 'CXXFLAGS', 'LDFLAGS'])
- configure_env = dict((k, os.environ[k]) for k in os.environ if k in env_keys)
- if configure_env:
--    config_str = ' '.join([k + '=' + pipes.quote(configure_env[k])
-+    config_str = ' '.join([k + '=' + shlex.quote(configure_env[k])
-                            for k in configure_env])
-     n.variable('configure_env', config_str + '$ ')
- n.newline()

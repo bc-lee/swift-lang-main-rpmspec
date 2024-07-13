@@ -9,7 +9,7 @@
 
 %global linux_version fedora
 
-%global fedora_release 1
+%global fedora_release 1.leebc
 %global swift_source_location swift-source
 
 Source0: version.inc
@@ -32,10 +32,13 @@ Patch2:         no_pipes.patch
 Patch3:         enable_lzma.patch
 patch4:         resource_dir.patch
 Patch5:         CF_Not_Glibc.patch
+Patch6:         preset.patch
 
 BuildRequires:  clang
 BuildRequires:  swig
 BuildRequires:  rsync
+BuildRequires:  cmake
+BuildRequires:  ninja-build
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -80,7 +83,7 @@ correct programs easier for the developer.
 
 
 %prep
-%setup -q -c -n %{swift_source_location} -T -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 -a 21 -a 22 -a 23 -a 24 -a 25 -a 26 -a 27 -a 28 -a 29 -a 30 -a 31 -a 32 -a 33 -a 34 -a 35 -a 36 -a 37 -a 38 -a 39 -a 40 -a 41 -a 42 -a 43 -a 44 -a 45 -a 46
+%setup -q -c -n %{swift_source_location} -T -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 -a 21 -a 22 -a 23 -a 24 -a 25 -a 26 -a 27 -a 28 -a 29 -a 30 -a 31 -a 32 -a 33 -a 34 -a 35 -a 36 -a 37 -a 38 -a 39 -a 40 -a 41 -a 42 -a 43 -a 44
 # The Swift build script requires directories to be named
 # in a specific way so renaming the source directories is
 # necessary
@@ -110,6 +113,8 @@ popd
 # Temporary I hope
 %patch -P5 -p0
 
+# Don't build ninja. Instead, use the system's ninja
+%patch -P6 -p1
 
 %build
 export VERBOSE=1
@@ -150,6 +155,8 @@ export QA_SKIP_RPATHS=1
 
 
 %changelog
+* Sat Jul 13 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.0-1.leebc
+- Use system's cmake / ninja
 * Sun Jun 30 2024 Ron Olson <tachoknight@gmail.com> - 6.0-1
 - Patch from finagolfin
   https://github.com/swiftlang/swift/pull/74814

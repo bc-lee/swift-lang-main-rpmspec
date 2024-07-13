@@ -17,7 +17,6 @@ import datetime
 import json
 import os
 import shlex
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -194,12 +193,11 @@ def main():
     return 1
 
   scheme_repos = schemes[scheme]["repos"]
-  # TODO(bc-lee): Use system's cmake and ninja to speed up the build
   # remove cmake and ninja
-  # if "cmake" in scheme_repos:
-  #   scheme_repos.pop("cmake")
-  # if "ninja" in scheme_repos:
-  #   scheme_repos.pop("ninja")
+  if "cmake" in scheme_repos:
+    scheme_repos.pop("cmake")
+  if "ninja" in scheme_repos:
+    scheme_repos.pop("ninja")
 
   repo_map = dict()
   for repo, branch in scheme_repos.items():
