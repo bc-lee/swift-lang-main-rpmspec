@@ -9,7 +9,7 @@
 
 %global linux_version fedora
 
-%global fedora_release 1.leebc
+%global fedora_release 1.leebc2
 %global swift_source_location swift-source
 
 Source0: version.inc
@@ -33,6 +33,7 @@ Patch3:         enable_lzma.patch
 patch4:         resource_dir.patch
 Patch5:         CF_Not_Glibc.patch
 Patch6:         preset.patch
+Patch7:         lldb-Adapt-code-to-Python-3.13-70445.patch
 
 BuildRequires:  clang
 BuildRequires:  swig
@@ -116,6 +117,10 @@ popd
 # Don't build ninja. Instead, use the system's ninja
 %patch -P6 -p1
 
+# [lldb] Adapt code to Python 3.13
+# TODO(bc-lee): Remove when https://github.com/swiftlang/llvm-project/pull/8980 is merged
+%patch -P7 -p0
+
 %build
 export VERBOSE=1
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib/swift/linux
@@ -155,6 +160,8 @@ export QA_SKIP_RPATHS=1
 
 
 %changelog
+* Sat Jul 13 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.0-1.leebc2
+- [lldb] Adapt code to Python 3.13
 * Sat Jul 13 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.0-1.leebc
 - Use system's cmake / ninja
 * Sun Jun 30 2024 Ron Olson <tachoknight@gmail.com> - 6.0-1

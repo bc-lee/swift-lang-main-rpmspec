@@ -1,0 +1,73 @@
+From b2929bebb6ce8d75acab4f2fde43213673cb6010 Mon Sep 17 00:00:00 2001
+From: Tulio Magno Quites Machado Filho <tuliom@redhat.com>
+Date: Mon, 30 Oct 2023 08:55:34 -0300
+Subject: [PATCH] [lldb] Adapt code to Python 3.13 (#70445)
+
+1. Remove usage of PyEval_ThreadsInitialized and PyEval_InitThreads
+
+Both of these functions were removed in Python 3.13 [1] after being
+deprecated since Python 3.9.
+
+According to "What's new in Python 3.13" document [1]:
+
+    Since Python 3.7, Py_Initialize() always creates the GIL: calling
+    PyEval_InitThreads() did nothing and PyEval_ThreadsInitialized()
+    always returned non-zero.
+
+2. Replace _Py_IsFinalizing() with Py_IsFinalizing().
+
+[1] https://docs.python.org/3.13/whatsnew/3.13.html
+---
+ .../ScriptInterpreter/Python/PythonDataObjects.cpp       | 4 +++-
+ .../ScriptInterpreter/Python/ScriptInterpreterPython.cpp | 9 +++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/lldb/source/Plugins/ScriptInterpreter/Python/PythonDataObjects.cpp b/lldb/source/Plugins/ScriptInterpreter/Python/PythonDataObjects.cpp
+index 9ac840a4a102..fe3438c42471 100644
+--- llvm-project/lldb/source/Plugins/ScriptInterpreter/Python/PythonDataObjects.cpp
++++ llvm-project/lldb/source/Plugins/ScriptInterpreter/Python/PythonDataObjects.cpp
+@@ -71,7 +71,9 @@ Expected<std::string> python::As<std::string>(Expected<PythonObject> &&obj) {
+ }
+ 
+ static bool python_is_finalizing() {
+-#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 7
++#if (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 13) || (PY_MAJOR_VERSION > 3)
++  return Py_IsFinalizing();
++#elif PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 7
+   return _Py_Finalizing != nullptr;
+ #else
+   return _Py_IsFinalizing();
+diff --git a/lldb/source/Plugins/ScriptInterpreter/Python/ScriptInterpreterPython.cpp b/lldb/source/Plugins/ScriptInterpreter/Python/ScriptInterpreterPython.cpp
+index a57c8e4984ad..968cc8ca0300 100644
+--- llvm-project/lldb/source/Plugins/ScriptInterpreter/Python/ScriptInterpreterPython.cpp
++++ llvm-project/lldb/source/Plugins/ScriptInterpreter/Python/ScriptInterpreterPython.cpp
+@@ -179,18 +179,27 @@ private:
+       return;
+ #endif
+ 
++// `PyEval_ThreadsInitialized` was deprecated in Python 3.9 and removed in
++// Python 3.13. It has been returning `true` always since Python 3.7.
++#if (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 9) || (PY_MAJOR_VERSION < 3)
+     if (PyEval_ThreadsInitialized()) {
++#endif
+       Log *log = GetLog(LLDBLog::Script);
+ 
+       m_was_already_initialized = true;
+       m_gil_state = PyGILState_Ensure();
+       LLDB_LOGV(log, "Ensured PyGILState. Previous state = {0}locked\n",
+                 m_gil_state == PyGILState_UNLOCKED ? "un" : "");
++
++// `PyEval_InitThreads` was deprecated in Python 3.9 and removed in
++// Python 3.13.
++#if (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 9) || (PY_MAJOR_VERSION < 3)
+       return;
+     }
+ 
+     // InitThreads acquires the GIL if it hasn't been called before.
+     PyEval_InitThreads();
++#endif
+   }
+ 
+   PyGILState_STATE m_gil_state = PyGILState_UNLOCKED;
+-- 
+2.45.2
