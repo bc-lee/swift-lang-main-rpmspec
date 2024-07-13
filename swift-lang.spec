@@ -9,83 +9,23 @@
 
 %global linux_version fedora
 
-#################################################
-# Make sure these are changed for every release!
-#################################################
-%global swift_version 6.0-DEVELOPMENT-SNAPSHOT-2024-07-10-a
 %global fedora_release 1
-%global package_version 6.0
-
 %global swift_source_location swift-source
 
-# Set to the right version per the json file
-%global icu_version 69
-%global yams_version 5.0.6
-%global swift_argument_parser_version 1.2.3
-%global swift_crypto_version 3.0.0
-%global ninja_version 1.11.1
-%global cmake_version 3.24.2
-%global swift_atomics_version 1.2.0
-%global swift_collections_version 1.1.1
-%global swift_numerics_version 1.0.2
-%global swift_system_version 1.3.0
-%global swift_nio_version 2.31.2
-%global swift_nio_ssl_version 2.15.0
-%global swift_certificates_version 1.0.1
-%global swift_asn1_version 1.0.0
-%global wasmkit_version 0.0.3
-%global wasi_version 20
-%global swift_format_version 6.0
-%global swift_llvm_bindings_version 6.0
+Source0: version.inc
+Source1: source.inc
+Source2: rename.inc
 
+%include %{SOURCE0}
 
 Name:           swift-lang
-Version:        %{package_version}
+Version:        %{swift_version}
 Release:        %{fedora_release}%{?dist}
 Summary:        The Swift programming language
 License:        Apache-2.0
 URL:            https://www.swift.org
 
-Source0:        https://github.com/apple/swift/archive/refs/tags/swift-%{swift_version}.tar.gz#/swift.tar.gz
-Source1:        https://github.com/apple/swift-corelibs-libdispatch/archive/swift-%{swift_version}.tar.gz#/corelibs-libdispatch.tar.gz
-Source2:        https://github.com/apple/swift-corelibs-foundation/archive/swift-%{swift_version}.tar.gz#/corelibs-foundation.tar.gz
-Source3:        https://github.com/apple/swift-integration-tests/archive/swift-%{swift_version}.tar.gz#/swift-integration-tests.tar.gz
-Source4:        https://github.com/apple/swift-corelibs-xctest/archive/swift-%{swift_version}.tar.gz#/corelibs-xctest.tar.gz
-Source5:        https://github.com/apple/swift-package-manager/archive/swift-%{swift_version}.tar.gz#/package-manager.tar.gz
-Source6:        https://github.com/apple/swift-llbuild/archive/swift-%{swift_version}.tar.gz#/llbuild.tar.gz
-Source7:        https://github.com/apple/swift-cmark/archive/swift-%{swift_version}.tar.gz#/cmark.tar.gz
-Source8:        https://github.com/apple/swift-xcode-playground-support/archive/swift-%{swift_version}.tar.gz#/swift-xcode-playground-support.tar.gz
-Source9:        https://github.com/apple/sourcekit-lsp/archive/swift-%{swift_version}.tar.gz#/sourcekit-lsp.tar.gz
-Source10:       https://github.com/apple/indexstore-db/archive/swift-%{swift_version}.tar.gz#/indexstore-db.tar.gz
-Source11:       https://github.com/apple/llvm-project/archive/swift-%{swift_version}.tar.gz#/llvm-project.tar.gz
-Source12:       https://github.com/apple/swift-tools-support-core/archive/swift-%{swift_version}.tar.gz#/swift-tools-support-core.tar.gz
-Source13:       https://github.com/apple/swift-argument-parser/archive/%{swift_argument_parser_version}.tar.gz#/swift-argument-parser.tar.gz
-Source14:       https://github.com/apple/swift-driver/archive/swift-%{swift_version}.tar.gz#/swift-driver.tar.gz
-Source15:       https://github.com/apple/swift-syntax/archive/swift-%{swift_version}.zip#/swift-syntax.tar.gz
-Source16:       https://github.com/jpsim/Yams/archive/%{yams_version}.tar.gz#/yams.tar.gz
-Source17:       https://github.com/apple/swift-crypto/archive/refs/tags/%{swift_crypto_version}.tar.gz#/swift-crypto.tar.gz
-Source18:       https://github.com/ninja-build/ninja/archive/refs/tags/v%{ninja_version}.tar.gz#/ninja.tar.gz
-Source19:       https://github.com/KitWare/CMake/archive/refs/tags/v%{cmake_version}.tar.gz#/cmake.tar.gz
-Source20:       https://github.com/apple/swift-atomics/archive/%{swift_atomics_version}.tar.gz#/swift-atomics.tar.gz
-Source21:       https://github.com/apple/swift-stress-tester/archive/swift-%{swift_version}.tar.gz#/swift-stress-tester.tar.gz
-Source22:       https://github.com/apple/swift-docc/archive/swift-%{swift_version}.tar.gz#/swift-docc.tar.gz
-Source23:       https://github.com/apple/swift-docc-render-artifact/archive/swift-%{swift_version}.tar.gz#/swift-docc-render-artifact.tar.gz
-Source24:       https://github.com/apple/swift-docc-symbolkit/archive/swift-%{swift_version}.tar.gz#/swift-docc-symbolkit.tar.gz
-Source25:       https://github.com/apple/swift-collections/archive/%{swift_collections_version}.tar.gz#/swift-collections.tar.gz
-Source26:       https://github.com/apple/swift-numerics/archive/%{swift_numerics_version}.tar.gz#/swift-numerics.tar.gz
-Source27:       https://github.com/apple/swift-system/archive/%{swift_system_version}.tar.gz#/swift-system.tar.gz
-Source28:       https://github.com/apple/swift-nio/archive/%{swift_nio_version}.tar.gz#/swift-nio.tar.gz
-Source29:       https://github.com/apple/swift-nio-ssl/archive/%{swift_nio_ssl_version}.tar.gz#/swift-nio-ssl.tar.gz
-Source30:       https://github.com/apple/swift-format/archive/refs/heads/release/%{swift_format_version}.zip#/swift-format.zip
-Source31:       https://github.com/apple/swift-lmdb/archive/swift-%{swift_version}.tar.gz#/swift-lmdb.tar.gz
-Source32:       https://github.com/apple/swift-markdown/archive/swift-%{swift_version}.tar.gz#/swift-markdown.tar.gz
-Source33:       https://github.com/apple/swift-experimental-string-processing/archive/swift-%{swift_version}.tar.gz#/swift-experimental-string-processing.tar.gz
-Source34:       https://github.com/apple/swift-certificates/archive/%{swift_certificates_version}.tar.gz#/swift-certificates.tar.gz
-Source35:       https://github.com/apple/swift-asn1/archive/%{swift_asn1_version}.tar.gz#/swift-asn1.tar.gz
-Source36:       https://github.com/unicode-org/icu/archive/refs/heads/maint/maint-%{icu_version}.zip#/icu.zip
-Source37:       https://github.com/swiftwasm/WasmKit/archive/refs/tags/%{wasmkit_version}.tar.gz#/wasm.tar.gz
-Source38:       https://github.com/WebAssembly/wasi-libc/archive/refs/tags/wasi-sdk-%{wasi_version}.tar.gz#/wasi-sdk.tar.gz
-Source39:       https://github.com/apple/swift-llvm-bindings/archive/refs/heads/swift/release/%{swift_llvm_bindings_version}.zip#/swift-llvm-bindings.zip
+%include %{SOURCE1}
 
 Patch1:         need_pic.patch
 Patch2:         no_pipes.patch
@@ -122,78 +62,33 @@ Requires:       gcc
 Requires:       ncurses-devel
 Requires:       lldb
 
-ExclusiveArch:  x86_64 aarch64 
+ExclusiveArch:  x86_64 aarch64
 
 Provides:       swiftlang = %{version}-%{release}
 
 
 %description
-Swift is a general-purpose programming language built using 
-a modern approach to safety, performance, and software design 
+Swift is a general-purpose programming language built using
+a modern approach to safety, performance, and software design
 patterns.
 
-The goal of the Swift project is to create the best available 
-language for uses ranging from systems programming, to mobile 
-and desktop apps, scaling up to cloud services. Most 
-importantly, Swift is designed to make writing and maintaining 
-correct programs easier for the developer. 
+The goal of the Swift project is to create the best available
+language for uses ranging from systems programming, to mobile
+and desktop apps, scaling up to cloud services. Most
+importantly, Swift is designed to make writing and maintaining
+correct programs easier for the developer.
 
 
 %prep
-%setup -q -c -n %{swift_source_location} -a 0 -a 1 -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 -a 21 -a 22 -a 23 -a 24 -a 25 -a 26 -a 27 -a 28 -a 29 -a 30 -a 31 -a 32 -a 33 -a 34 -a 35 -a 36 -a 37 -a 38 -a 39
+%setup -q -c -n %{swift_source_location} -T -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 -a 21 -a 22 -a 23 -a 24 -a 25 -a 26 -a 27 -a 28 -a 29 -a 30 -a 31 -a 32 -a 33 -a 34 -a 35 -a 36 -a 37 -a 38 -a 39 -a 40 -a 41 -a 42 -a 43 -a 44 -a 45 -a 46
 # The Swift build script requires directories to be named
 # in a specific way so renaming the source directories is
 # necessary
-mv swift-cmark-swift-%{swift_version} cmark
-mv swift-corelibs-foundation-swift-%{swift_version} swift-corelibs-foundation
-mv swift-corelibs-libdispatch-swift-%{swift_version} swift-corelibs-libdispatch
-mv swift-corelibs-xctest-swift-%{swift_version} swift-corelibs-xctest
-mv swift-integration-tests-swift-%{swift_version} swift-integration-tests
-mv swift-llbuild-swift-%{swift_version} llbuild
-mv swift-package-manager-swift-%{swift_version} swiftpm
-mv swift-swift-%{swift_version} swift
-mv swift-xcode-playground-support-swift-%{swift_version} swift-xcode-playground-support
-mv sourcekit-lsp-swift-%{swift_version} sourcekit-lsp
-mv indexstore-db-swift-%{swift_version} indexstore-db
-mv llvm-project-swift-%{swift_version} llvm-project
-mv swift-syntax-swift-%{swift_version} swift-syntax
-mv swift-tools-support-core-swift-%{swift_version} swift-tools-support-core
-mv swift-argument-parser-%{swift_argument_parser_version} swift-argument-parser
-mv swift-driver-swift-%{swift_version} swift-driver
-mv swift-crypto-%{swift_crypto_version} swift-crypto
-mv CMake-%{cmake_version} cmake
-mv swift-atomics-%{swift_atomics_version} swift-atomics
-mv swift-docc-swift-%{swift_version} swift-docc
-mv swift-docc-render-artifact-swift-%{swift_version} swift-docc-render-artifact
-mv swift-docc-symbolkit-swift-%{swift_version} swift-docc-symbolkit
-mv swift-collections-%{swift_collections_version} swift-collections
-mv swift-numerics-%{swift_numerics_version} swift-numerics
-mv swift-system-%{swift_system_version} swift-system
-mv swift-nio-%{swift_nio_version} swift-nio
-mv swift-nio-ssl-%{swift_nio_ssl_version} swift-nio-ssl
-mv swift-format-release-%{swift_format_version} swift-format
-mv swift-lmdb-swift-%{swift_version} swift-lmdb
-mv swift-markdown-swift-%{swift_version} swift-markdown
-mv swift-stress-tester-swift-%{swift_version} swift-stress-tester
-mv swift-experimental-string-processing-swift-%{swift_version} swift-experimental-string-processing
-mv swift-certificates-%{swift_certificates_version} swift-certificates
-mv swift-asn1-%{swift_asn1_version} swift-asn1
-mv swift-llvm-bindings-swift-release-%{swift_llvm_bindings_version} swift-llvm-bindings
 
-# ICU 
-mv icu-maint-maint-%{icu_version} icu
-
-# Yams
-mv Yams-%{yams_version} yams
-
-# Ninja
-mv ninja-%{ninja_version} ninja
-
-# WasmKit
-mv WasmKit-%{wasmkit_version} wasmkit
+%include %{SOURCE2}
 
 
-# Fix python to python3 
+# Fix python to python3
 %py3_shebang_fix swift/utils/api_checker/swift-api-checker.py
 %py3_shebang_fix llvm-project/compiler-rt/lib/hwasan/scripts/hwasan_symbolize
 
@@ -295,7 +190,7 @@ export QA_SKIP_RPATHS=1
 * Mon Apr 25 2022 Ron Olson <tachoknight@gmail.com> - 5.7-1
 - First attempt to build swift-5.7
 * Thu Apr 21 2022 Ron Olson <tachoknight@gmail.com> - 5.6.1-2
-- Removed ncurses-compat-libs as a runtime dependency as it 
+- Removed ncurses-compat-libs as a runtime dependency as it
   has been removed from Fedora Rawhide
 * Mon Apr 11 2022 Ron Olson <tachoknight@gmail.com> - 5.6.1-1
 - Updated to Swift 5.6.1-RELEASE
@@ -551,7 +446,7 @@ export QA_SKIP_RPATHS=1
 * Thu Jul 25 2019 Ron Olson <tachoknight@gmail.com> 5.1-0.25.20190724gite9b6385
 - Updated to swift-5.1-DEVELOPMENT-SNAPSHOT-2019-07-24-a
 * Wed Jul 24 2019 Ron Olson <tachoknight@gmail.com> 5.1-0.24.20190723git3e8f631
-- Updated to swift-5.1-DEVELOPMENT-SNAPSHOT-2019-07-23-a 
+- Updated to swift-5.1-DEVELOPMENT-SNAPSHOT-2019-07-23-a
 * Tue Jul 23 2019 Ron Olson <tachoknight@gmail.com> 5.1-0.23.20190719gitf883175
 - Updated to swift-5.1-DEVELOPMENT-SNAPSHOT-2019-07-19-a and first version
   that relies on Python 3 for building
@@ -572,7 +467,7 @@ export QA_SKIP_RPATHS=1
 * Wed Jul 03 2019 Ron Olson <tachoknight@gmail.com> 5.1-0.15.20190702git2efadfd
 - Updated to swift-5.1-DEVELOPMENT-SNAPSHOT-2019-07-02-a
 * Tue Jul 02 2019 Ron Olson <tachoknight@gmail.com> 5.1-0.14.20190701git6761ba4
-- Updated to swift-5.1-DEVELOPMENT-SNAPSHOT-2019-07-01-a and removed 
+- Updated to swift-5.1-DEVELOPMENT-SNAPSHOT-2019-07-01-a and removed
   dependency on python-sphinx as a problem with a pygments lexer was being
   treated as an error and causing the builds to fail
 * Sun Jun 30 2019 Ron Olson <tachoknight@gmail.com> 5.1-0.13.20190629gitdcde8ac
@@ -617,7 +512,7 @@ export QA_SKIP_RPATHS=1
   report has been filed with CMake but until it is resolved, the cmake file
   has been patched to not perform the copy.
 * Fri Mar 15 2019 Ron Olson <tachoknight@gmail.com> 5.0-0.50.20190310git4d6e741
-- Modules did not work properly in the REPL due to additional lib path; 
+- Modules did not work properly in the REPL due to additional lib path;
   fixed with symlinks to the lower directory structures
 * Fri Mar 15 2019 Ron Olson <tachoknight@gmail.com> 5.0-0.50.20190310git4d6e741
 - python2-sphinx was removed from Fedora after 30 so it will use the python3
@@ -685,8 +580,8 @@ export QA_SKIP_RPATHS=1
 - Updated to swift-5.0-DEVELOPMENT-SNAPSHOT-2018-12-06-a
 * Wed Dec 05 2018 Ron Olson <tachoknight@gmail.com> 5.0-0.22.20181204gitb74d54a
 - Updated to swift-5.0-DEVELOPMENT-SNAPSHOT-2018-12-04-a
-* Wed Dec 05 2018 Egor Zhdan <egor.zhdan@gmail.com>            
-- Include dependencies to ncurses which are required by SourceKit and 
+* Wed Dec 05 2018 Egor Zhdan <egor.zhdan@gmail.com>
+- Include dependencies to ncurses which are required by SourceKit and
   included in Apple installation guide
 * Wed Dec 05 2018 Ron Olson <tachoknight@gmail.com> 5.0-0.21.20181204gitfacaad1
 - Updated to swift-DEVELOPMENT-SNAPSHOT-2018-12-04-a
@@ -851,7 +746,7 @@ export QA_SKIP_RPATHS=1
 * Thu Jul 19 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.35.20180718gite325e32
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-18-a
 * Tue Jul 17 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.34.20180716gitaaf545a
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-16-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-16-a
 * Sun Jul 15 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.33.20180703git107e307
 - Switched from __provides_exclude_from to __provides_exclude to inhibit
   lldb being included as a dependency
@@ -860,7 +755,7 @@ export QA_SKIP_RPATHS=1
   in the REPL seems to have been broken as of the 2018-07-04 builds.
   2018-07-03 is currently the best version until the issue is resolved.
 * Thu Jul 12 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.31.20180711git104c96a
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-11-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-11-a
 * Wed Jul 11 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.30.20180709gitd9561d9
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-09-a and added a check to
   include python-unversioned-command for verisons greated than 28 while
@@ -878,21 +773,21 @@ export QA_SKIP_RPATHS=1
 * Tue Jul 03 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.26.20180703git107e307
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-03-a, added a
   filter for excluding lldb libraries from public view, and broke out the
-  runtime libraries into their own -runtime package. 
+  runtime libraries into their own -runtime package.
 * Mon Jul 02 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.25.20180702gitc2e1567
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-02-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-02-a
 * Mon Jul 02 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.24.20180701git6079032
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-01-a, removed unnecessary
   lldb headers
 * Sat Jun 30 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.23.20180630gitb3408e8
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-30-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-30-a
 * Fri Jun 29 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.22.20180629gitdab0d8e
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-29-a, removed unnecessary
   files and links
 * Fri Jun 29 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.21.20180628git9f8f2a1
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-28-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-28-a
 * Thu Jun 28 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.20.20180626gitbe3b9a7
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-26-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-26-a
 * Wed Jun 13 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.19.20180612gitbb9532c
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-12-a and removed
   gcc-c++ as a build requirement
@@ -900,19 +795,19 @@ export QA_SKIP_RPATHS=1
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-10-a and removed
   separate ninja build (will now use the repo-based one)
 * Mon Jun 11 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.17.20180610git7a35ad0
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-10-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-10-a
 * Fri Jun 08 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.16.20180607git78e9497
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-07-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-07-a
 * Thu Jun 07 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.15.20180606git4e2064e
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-06-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-06-a
 * Tue Jun 05 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.14.20180604git9e274fc
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-04-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-04-a
 * Sun Jun 03 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.13.20180602gitadad0f5
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-02-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-02-a
 * Wed May 30 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.12.20180529git4160301
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-05-29-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-05-29-a
 * Wed May 23 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.11.20180522git58f7399
-- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-05-22-a 
+- Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-05-22-a
 * Mon May 21 2018 Ron Olson <tachoknight@gmail.com> 4.2-0.10.20180520gitbb77484
 - Updated to swift-4.2-DEVELOPMENT-SNAPSHOT-2018-05-20-a and added
   patch for removing sys/ustat.h references

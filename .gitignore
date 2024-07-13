@@ -1,1 +1,9 @@
 *.tar.gz
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+# Project Specific
+rename.inc
+source.inc
+version.inc
