@@ -173,6 +173,9 @@ def main():
     print(f"Scheme {scheme} not found in the version map.")
     return 1
 
+  if src_dir:
+    src_dir = Path(src_dir)
+
   config = read_checkout_config(scheme, src_dir)
 
   if "repos" not in config:
