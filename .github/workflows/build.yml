@@ -33,8 +33,10 @@ jobs:
 
       - name: Create SRPM
         id: create-srpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tools/generate_src_info.py
+          tools/generate_src_info.py --scheme release/6.0
           generated_files=(version.inc source.inc rename.inc)
           for file in "${generated_files[@]}"; do
             if [ ! -f "$file" ]; then
