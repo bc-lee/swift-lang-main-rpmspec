@@ -9,7 +9,7 @@
 
 %global linux_version fedora
 
-%global fedora_release 1.leebc3
+%global fedora_release 1.leebc4
 %global swift_source_location swift-source
 
 Source0: version.inc
@@ -125,47 +125,8 @@ popd
 export VERBOSE=1
 
 # Here we go!
-swift/utils/build-script \
-  '--swift-install-components=autolink-driver;compiler;clang-resource-dir-symlink;libexec;stdlib;swift-remote-mirror;sdk-overlay;static-mirror-lib;toolchain-tools;license;sourcekit-inproc' \
-  '--llvm-install-components=llvm-ar;llvm-ranlib;llvm-cov;llvm-profdata;clang;clang-resource-headers;compiler-rt;clangd;lld;LTO;clang-features-file' \
-  --libicu \
-  --build-ninja=False \
-  --install-llvm \
-  --install-static-linux-config \
-  --install-swift \
-  --install-lldb \
-  --install-swiftsyntax \
-  --install-libicu \
-  --install-prefix=/usr \
-  --build-swift-static-stdlib \
-  --build-swift-static-sdk-overlay \
-  --build-swift-stdlib-unittest-extra \
-  --install-destdir=%{_builddir} \
-  --installable-package=%{_builddir}/swift-%{version}-%{linux_version}.tar.gz \
-  --relocate-xdg-cache-home-under-build-subdir \
-  --build-subdir=buildbot_linux \
-  --lldb \
-  --release \
-  --test \
-  --validation-test \
-  --long-test \
-  --stress-test \
-  --test-optimized \
-  --foundation \
-  --libdispatch \
-  --lldb-test-swift-only \
-  --install-foundation \
-  --install-libdispatch \
-  --reconfigure '--llvm-cmake-options=-DCROSS_TOOLCHAIN_FLAGS_LLVM_NATIVE='"'"'-DCMAKE_C_COMPILER=clang;-DCMAKE_CXX_COMPILER=clang++'"'"'' \
-  --no-assertions \
-  --skip-test-cmark \
-  --skip-test-lldb \
-  --skip-test-swift \
-  --skip-test-foundation \
-  --skip-test-libdispatch \
-  --skip-test-playgroundsupport \
-  --skip-test-libicu \
-  --skip-test-wasm-stdlib
+swift/utils/build-script --preset=buildbot_linux,no_assertions,no_test install_destdir=%{_builddir} installable_package=%{_builddir}/swift-%{version}-%{linux_version}.tar.gz
+
 
 %install
 mkdir -p %{buildroot}%{_libexecdir}/swift/%{package_version}
@@ -173,6 +134,7 @@ cp -r %{_builddir}/usr/* %{buildroot}%{_libexecdir}/swift/%{package_version}
 mkdir -p %{buildroot}%{_bindir}
 ln -fs %{_libexecdir}/swift/%{package_version}/bin/swift %{buildroot}%{_bindir}/swift
 ln -fs %{_libexecdir}/swift/%{package_version}/bin/swiftc %{buildroot}%{_bindir}/swiftc
+ln -fs %{_libexecdir}/swift/%{package_version}/bin/sourcekit-lsp %{buildroot}%{_bindir}/sourcekit-lsp
 mkdir -p %{buildroot}%{_mandir}/man1
 cp %{_builddir}/usr/share/man/man1/swift.1 %{buildroot}%{_mandir}/man1/swift.1
 mkdir -p %{buildroot}/usr/lib
@@ -187,6 +149,7 @@ export QA_SKIP_RPATHS=1
 %license swift/LICENSE.txt
 %{_bindir}/swift
 %{_bindir}/swiftc
+%{_bindir}/sourcekit-lsp
 %{_mandir}/man1/swift.1.gz
 %{_libexecdir}/swift/
 %{_usr}/lib/swift
@@ -196,6 +159,8 @@ export QA_SKIP_RPATHS=1
 
 
 %changelog
+* Tue Jul 16 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.0-1.leebc4
+- Build full package, without tests and assertions
 * Tue Jul 16 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.0-1.leebc3
 - Build minimal version of Swift 6.0
 * Sat Jul 13 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.0-1.leebc2
