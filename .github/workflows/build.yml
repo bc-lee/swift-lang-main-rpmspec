@@ -64,12 +64,12 @@ jobs:
             done
           done
 
-          copr build ${args} leebc/swift-lang-beta ${{ steps.create-srpm.outputs.srpm-file }} --timeout 43200 --nowait
+          copr build ${args} leebc/swift-lang-main ${{ steps.create-srpm.outputs.srpm-file }} --timeout 43200 --nowait
 
       - name: Notify failure
         if: failure()
         run: |
-          message="swift-lang-beta build failed. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID for details."
+          message="swift-lang-main build failed. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID for details."
           tools/send-slack.py --message "$message" --url ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Cleanup copr credentials
