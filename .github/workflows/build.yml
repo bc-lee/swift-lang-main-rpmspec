@@ -36,7 +36,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tools/generate_src_info.py --scheme release/6.0
+          tools/generate_src_info.py --scheme main
           generated_files=(version.inc source.inc rename.inc)
           for file in "${generated_files[@]}"; do
             if [ ! -f "$file" ]; then
@@ -46,7 +46,7 @@ jobs:
             echo "$file:"
             cat "$file"
           done
-          tools/validate_version.sh version.inc 6.0
+          tools/validate_version.sh version.inc 6.1
 
           make -f .copr/Makefile srpm outdir=$(pwd) spec=$(pwd)
           srpm_file=$(ls -1 swift-*.src.rpm)

@@ -1,18 +1,18 @@
 --- old/swift/utils/build-presets.ini
 +++ new/swift/utils/build-presets.ini
-@@ -823,41 +823,41 @@ no-swift-stdlib-assertions
+@@ -827,41 +827,41 @@ no-swift-stdlib-assertions
  #===------------------------------------------------------------------------===#
  # Linux Builders
  #===------------------------------------------------------------------------===#
  [preset: mixin_linux_install_components_with_clang]
-
+ 
  swift-install-components=autolink-driver;compiler;clang-resource-dir-symlink;libexec;stdlib;swift-remote-mirror;sdk-overlay;static-mirror-lib;toolchain-tools;license;sourcekit-inproc
  llvm-install-components=llvm-ar;llvm-ranlib;llvm-cov;llvm-profdata;IndexStore;clang;clang-resource-headers;compiler-rt;clangd;lld;LTO;clang-features-file
-
+ 
  [preset: mixin_linux_installation]
  mixin-preset=
      mixin_linux_install_components_with_clang
-
+ 
  llbuild
  swiftpm
  swift-driver
@@ -20,7 +20,7 @@
  libicu
  swiftdocc
  swiftformat
-
+ 
 -build-ninja
 +build-ninja=False
  install-llvm
@@ -40,6 +40,6 @@
  build-swift-static-stdlib
  build-swift-static-sdk-overlay
  build-swift-stdlib-unittest-extra
-
+ build-embedded-stdlib-cross-compiling
+ 
  # Executes the lit tests for the installable package that is created
- # Assumes the swift-integration-tests repo is checked out
