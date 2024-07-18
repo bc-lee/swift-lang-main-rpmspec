@@ -9,7 +9,7 @@
 
 %global linux_version fedora
 
-%global fedora_release 1.leebc
+%global fedora_release 1.leebc1
 %global swift_source_location swift-source
 
 Source0: version.inc
@@ -31,9 +31,9 @@ Patch1:         need_pic.patch
 Patch2:         no_pipes.patch
 Patch3:         enable_lzma.patch
 patch4:         resource_dir.patch
-Patch5:         CF_Not_Glibc.patch
-Patch6:         preset.patch
-Patch7:         lldb-Adapt-code-to-Python-3.13-70445.patch
+Patch5:         preset.patch
+Patch6:         lldb-Adapt-code-to-Python-3.13-70445.patch
+Patch7:         cf-cmake-strlcpy.patch
 
 BuildRequires:  clang
 BuildRequires:  swig
@@ -110,15 +110,15 @@ pushd swift
 %patch -P4 -p1
 popd
 
-# https://forums.swift.org/t/cannot-build-toolchain-on-ubuntu-24-04-lts/72200
-# Temporary I hope
-%patch -P5 -p0
-
 # Don't build ninja. Instead, use the system's ninja
-%patch -P6 -p1
+%patch -P5 -p1
 
 # [lldb] Adapt code to Python 3.13
 # TODO(bc-lee): Remove when https://github.com/swiftlang/llvm-project/pull/8980 is merged
+%patch -P6 -p0
+
+# Add checks for strlcat and strlcpy symbols in CMake
+# TODO(bc-lee): Remove when https://github.com/apple/swift-corelibs-foundation/pull/5013 is merged
 %patch -P7 -p0
 
 %build
@@ -216,6 +216,8 @@ export QA_SKIP_RPATHS=1
 
 
 %changelog
+* Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc1
+- Add checks for strlcat and strlcpy symbols in CMake
 * Wed Jul 17 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc
 - Build for Swift main branch
 * Wed Jul 17 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.0-1.leebc5
