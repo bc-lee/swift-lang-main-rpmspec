@@ -9,7 +9,7 @@
 
 %global linux_version fedora
 
-%global fedora_release 1.leebc2
+%global fedora_release 1.leebc3
 %global swift_source_location swift-source
 
 Source0: version.inc
@@ -134,7 +134,6 @@ swift/utils/build-script \
   --swiftpm \
   --swift-driver \
   --xctest \
-  --libicu \
   --build-ninja=False \
   --install-llvm \
   --install-static-linux-config \
@@ -145,7 +144,6 @@ swift/utils/build-script \
   --install-swift-driver \
   --install-swiftsyntax \
   --install-xctest \
-  --install-libicu \
   --install-prefix=/usr \
   --install-sourcekit-lsp \
   --build-swift-static-stdlib \
@@ -182,7 +180,6 @@ swift/utils/build-script \
   --skip-test-foundation \
   --skip-test-libdispatch \
   --skip-test-playgroundsupport \
-  --skip-test-libicu \
   --skip-test-indexstore-db \
   --skip-test-sourcekit-lsp \
   --skip-test-wasm-stdlib
@@ -218,7 +215,9 @@ export QA_SKIP_RPATHS=1
 
 
 %changelog
-* Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1..leebc2
+* Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc3
+- Modify preset.patch in accordance with the latest changes
+* Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc2
 - Reduce number of sources
 * Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc1
 - Add checks for strlcat and strlcpy symbols in CMake

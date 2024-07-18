@@ -1,6 +1,7 @@
 --- old/swift/utils/build-presets.ini
 +++ new/swift/utils/build-presets.ini
-@@ -827,41 +827,41 @@ no-swift-stdlib-assertions
+@@ -826,41 +826,41 @@ no-swift-stdlib-assertions
+ 
  #===------------------------------------------------------------------------===#
  # Linux Builders
  #===------------------------------------------------------------------------===#
@@ -17,7 +18,6 @@
  swiftpm
  swift-driver
  xctest
- libicu
  swiftdocc
  swiftformat
  
@@ -32,7 +32,6 @@
  install-swift-driver
  install-swiftsyntax
  install-xctest
- install-libicu
  install-prefix=/usr
  install-sourcekit-lsp
  install-swiftformat
@@ -43,3 +42,4 @@
  build-embedded-stdlib-cross-compiling
  
  # Executes the lit tests for the installable package that is created
+ # Assumes the swift-integration-tests repo is checked out
