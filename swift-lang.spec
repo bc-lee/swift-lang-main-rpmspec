@@ -9,7 +9,7 @@
 
 %global linux_version fedora
 
-%global fedora_release 1.leebc1
+%global fedora_release 1.leebc2
 %global swift_source_location swift-source
 
 Source0: version.inc
@@ -84,7 +84,9 @@ correct programs easier for the developer.
 
 
 %prep
-%setup -q -c -n %{swift_source_location} -T -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 -a 21 -a 22 -a 23 -a 24 -a 25 -a 26 -a 27 -a 28 -a 29 -a 30 -a 31 -a 32 -a 33 -a 34 -a 35 -a 36 -a 37 -a 38 -a 39 -a 40 -a 41 -a 42 -a 43 -a 44 -a 45 -a 46 -a 47 -a 48
+# TODO(bc-lee): Generate following line from tools/generate_src_info.py
+# since the number of sources may vary as time goes on
+%setup -q -c -n %{swift_source_location} -T -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 -a 21 -a 22 -a 23 -a 24 -a 25 -a 26 -a 27 -a 28 -a 29 -a 30 -a 31 -a 32 -a 33 -a 34 -a 35 -a 36 -a 37 -a 38 -a 39 -a 40 -a 41 -a 42 -a 43 -a 44 -a 45 -a 46 -a 47
 # The Swift build script requires directories to be named
 # in a specific way so renaming the source directories is
 # necessary
@@ -216,6 +218,8 @@ export QA_SKIP_RPATHS=1
 
 
 %changelog
+* Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1..leebc2
+- Reduce number of sources
 * Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc1
 - Add checks for strlcat and strlcpy symbols in CMake
 * Wed Jul 17 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc
