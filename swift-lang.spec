@@ -9,7 +9,7 @@
 
 %global linux_version fedora
 
-%global fedora_release 1.leebc4
+%global fedora_release 1.leebc5
 %global swift_source_location swift-source
 
 Source0: version.inc
@@ -57,8 +57,7 @@ BuildRequires:  python3-six
 BuildRequires:  binutils-devel
 BuildRequires:  zlib-devel
 BuildRequires:  python-unversioned-command
-# Temporary limit to use Swift 6.0
-BuildRequires:  swiftlang <= 6.0
+BuildRequires:  swiftlang
 BuildRequires:  lld
 
 Requires:       glibc-devel
@@ -216,6 +215,8 @@ export QA_SKIP_RPATHS=1
 
 
 %changelog
+* Sun Jul 21 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc5
+- Revert to remove Swift version restriction
 * Sun Jul 21 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc4
 - Temporary limit to use Swift 6.0
 * Thu Jul 18 2024 Byoungchan Lee <byoungchan.lee@gmx.com> - 6.1-1.leebc3
